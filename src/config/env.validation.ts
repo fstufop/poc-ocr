@@ -29,7 +29,7 @@ export class EnvironmentVariables {
   @Min(0)
   @Max(65535)
   @IsOptional()
-  PORT = 3000;
+  PORT: number = 3000;
 
   @IsString()
   @IsOptional()
@@ -55,11 +55,11 @@ export class EnvironmentVariables {
 
   @IsBoolean()
   @IsOptional()
-  DB_SYNCHRONIZE = false;
+  DB_SYNCHRONIZE: boolean = false;
 
   @IsBoolean()
   @IsOptional()
-  DB_LOGGING = false;
+  DB_LOGGING: boolean = false;
 
   // ---- Cache / Redis ----
   @IsString()
@@ -68,7 +68,7 @@ export class EnvironmentVariables {
   @IsInt()
   @Min(0)
   @IsOptional()
-  CACHE_TTL = 60000;
+  CACHE_TTL: number = 60000;
 }
 
 /**
