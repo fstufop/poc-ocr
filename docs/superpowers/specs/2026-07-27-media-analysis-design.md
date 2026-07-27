@@ -204,19 +204,20 @@ file: <áudio | imagem | PDF>
 
 ```typescript
 interface AIProviderPort {
-  analyze(input: AIAnalysisInput): Promise<AIAnalysisOutput>
+  analyze<T>(input: AIAnalysisInput): Promise<T>
 }
 
 interface AIAnalysisInput {
   fileBuffer: Buffer
   mimeType: string
   prompt: string
-}
-
-interface AIAnalysisOutput {
-  rawText: string
+  responseSchema: object  // JSON Schema — instrui a IA a retornar JSON estruturado
 }
 ```
+
+O adapter usa o **structured output** (JSON mode) do provedor para garantir que a resposta já chegue como JSON válido conforme o schema. O Processor recebe o objeto tipado diretamente — sem parsing manual de texto.
+
+O `Context` de cada endpoint define o `responseSchema` correspondente ao seu DTO de resposta.
 
 ### Troca de provedor
 
