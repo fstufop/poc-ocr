@@ -69,6 +69,40 @@ export class EnvironmentVariables {
   @Min(0)
   @IsOptional()
   CACHE_TTL: number = 60000;
+
+  // ---- Autenticação ----
+  @IsString()
+  API_KEY: string;
+
+  // ---- Gemini ----
+  @IsString()
+  GEMINI_API_KEY: string;
+
+  @IsString()
+  @IsOptional()
+  GEMINI_MODEL: string = 'gemini-1.5-flash';
+
+  // ---- Limites de arquivo ----
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  AUDIO_MAX_SIZE_MB: number = 25;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  IMAGE_MAX_SIZE_MB: number = 10;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  PDF_MAX_SIZE_MB: number = 20;
+
+  // ---- IA ----
+  @IsInt()
+  @Min(1000)
+  @IsOptional()
+  AI_TIMEOUT_MS: number = 30000;
 }
 
 /**
