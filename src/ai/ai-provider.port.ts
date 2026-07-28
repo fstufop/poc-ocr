@@ -7,6 +7,12 @@ export interface AIAnalysisInput {
   responseSchema: object;
 }
 
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+}
+
 export interface AIProviderPort {
-  analyze<T>(input: AIAnalysisInput): Promise<T>;
+  analyze<T>(input: AIAnalysisInput): Promise<{ data: T; tokenUsage: TokenUsage }>;
 }

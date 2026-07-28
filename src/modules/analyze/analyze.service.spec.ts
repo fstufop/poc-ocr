@@ -30,6 +30,11 @@ describe('AnalyzeService', () => {
       ...overrides,
     }) as Express.Multer.File;
 
+  const wrapResult = <T>(data: T) => ({
+    data,
+    tokenUsage: { inputTokens: 10, outputTokens: 5, totalTokens: 15 },
+  });
+
   beforeEach(async () => {
     audioProcessor = { extract: jest.fn() };
     imageProcessor = { extract: jest.fn() };
@@ -44,11 +49,12 @@ describe('AnalyzeService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn((key: string, def: number) => {
-              const map: Record<string, number> = {
+            get: jest.fn((key: string, def?: unknown) => {
+              const map: Record<string, unknown> = {
                 AUDIO_MAX_SIZE_MB: 25,
                 IMAGE_MAX_SIZE_MB: 10,
                 PDF_MAX_SIZE_MB: 20,
+                GEMINI_MODEL: 'gemini-1.5-flash',
               };
               return map[key] ?? def;
             }),
@@ -66,7 +72,7 @@ describe('AnalyzeService', () => {
       const expected = {
         medicines: [{ name: 'Amoxicilina', dosage: '500mg', frequency: '8h' }],
       };
-      imageProcessor.extract.mockResolvedValue(expected);
+      imageProcessor.extract.mockResolvedValue(wrapResult(expected));
 
       const result = await service.analyzeMedicines(file);
 
@@ -79,7 +85,7 @@ describe('AnalyzeService', () => {
 
     it('roteia audio/mpeg para AudioProcessor', async () => {
       const file = buildFile({ mimetype: 'audio/mpeg' });
-      audioProcessor.extract.mockResolvedValue({ medicines: [] });
+      audioProcessor.extract.mockResolvedValue(wrapResult({ medicines: [] }));
 
       await service.analyzeMedicines(file);
 
@@ -91,7 +97,7 @@ describe('AnalyzeService', () => {
 
     it('roteia application/pdf para PdfProcessor', async () => {
       const file = buildFile({ mimetype: 'application/pdf' });
-      pdfProcessor.extract.mockResolvedValue({ medicines: [] });
+      pdfProcessor.extract.mockResolvedValue(wrapResult({ medicines: [] }));
 
       await service.analyzeMedicines(file);
 
@@ -115,7 +121,7 @@ describe('AnalyzeService', () => {
     it('lança HttpException 413 quando arquivo excede o limite configurado', async () => {
       const file = buildFile({
         mimetype: 'image/jpeg',
-        size: 11 * 1024 * 1024, // 11 MB > limit of 10 MB
+        size: 11 * 1024 * 1024,
       });
 
       await expect(service.analyzeMedicines(file)).rejects.toMatchObject({
@@ -130,7 +136,7 @@ describe('AnalyzeService', () => {
       const expected = {
         vaccines: [{ name: 'BCG', date: '2020-01-01', dose: 'única' }],
       };
-      imageProcessor.extract.mockResolvedValue(expected);
+      imageProcessor.extract.mockResolvedValue(wrapResult(expected));
 
       const result = await service.analyzeVaccines(file);
 

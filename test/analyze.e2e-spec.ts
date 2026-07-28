@@ -20,6 +20,11 @@ describe('AnalyzeController (e2e)', () => {
     join(__dirname, 'fixtures/sample-receipt.pdf'),
   );
 
+  const wrapAiResult = <T>(data: T) => ({
+    data,
+    tokenUsage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+  });
+
   beforeAll(async () => {
     mockAiProvider = { analyze: jest.fn() };
 
@@ -30,6 +35,7 @@ describe('AnalyzeController (e2e)', () => {
           AUDIO_MAX_SIZE_MB: 25,
           IMAGE_MAX_SIZE_MB: 10,
           PDF_MAX_SIZE_MB: 20,
+          GEMINI_MODEL: 'gemini-1.5-flash',
         };
         return map[key] ?? def;
       }),
@@ -104,7 +110,7 @@ describe('AnalyzeController (e2e)', () => {
       const expected = {
         medicines: [{ name: 'Amoxicilina', dosage: '500mg', frequency: '8h' }],
       };
-      mockAiProvider.analyze.mockResolvedValue(expected);
+      mockAiProvider.analyze.mockResolvedValue(wrapAiResult(expected));
 
       return request(app.getHttpServer())
         .post('/api/analyze/medicines')
@@ -121,7 +127,7 @@ describe('AnalyzeController (e2e)', () => {
       const expected = {
         medicines: [{ name: 'Dipirona', dosage: '1g', frequency: '6h' }],
       };
-      mockAiProvider.analyze.mockResolvedValue(expected);
+      mockAiProvider.analyze.mockResolvedValue(wrapAiResult(expected));
 
       return request(app.getHttpServer())
         .post('/api/analyze/medicines')
@@ -140,7 +146,7 @@ describe('AnalyzeController (e2e)', () => {
       const expected = {
         vaccines: [{ name: 'BCG', date: '2020-01-15', dose: 'única' }],
       };
-      mockAiProvider.analyze.mockResolvedValue(expected);
+      mockAiProvider.analyze.mockResolvedValue(wrapAiResult(expected));
 
       return request(app.getHttpServer())
         .post('/api/analyze/vaccines')

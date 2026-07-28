@@ -96,7 +96,11 @@ export class AnalyzeService implements IAnalyzeService {
     this.validateFile(file);
     const processor = this.resolveProcessor(file.mimetype);
     this.logger.log(`Analyzing medicines — mimeType: ${file.mimetype}`);
-    return processor.extract<MedicinesAnalysisDto>(file, MedicinesContext);
+    const { data } = await processor.extract<MedicinesAnalysisDto>(
+      file,
+      MedicinesContext,
+    );
+    return data;
   }
 
   async analyzeVaccines(
@@ -105,6 +109,10 @@ export class AnalyzeService implements IAnalyzeService {
     this.validateFile(file);
     const processor = this.resolveProcessor(file.mimetype);
     this.logger.log(`Analyzing vaccines — mimeType: ${file.mimetype}`);
-    return processor.extract<VaccinesAnalysisDto>(file, VaccinesContext);
+    const { data } = await processor.extract<VaccinesAnalysisDto>(
+      file,
+      VaccinesContext,
+    );
+    return data;
   }
 }
