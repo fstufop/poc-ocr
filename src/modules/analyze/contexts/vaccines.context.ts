@@ -15,8 +15,14 @@ Retorne apenas os dados encontrados.`,
           type: 'object',
           properties: {
             name: { type: 'string', description: 'Nome da vacina' },
-            date: { type: 'string', description: 'Data de aplicação (ISO 8601 ou texto livre)' },
-            dose: { type: 'string', description: 'Tipo ou número da dose (ex: única, 1ª dose)' },
+            date: {
+              type: 'string',
+              description: 'Data de aplicação (ISO 8601 ou texto livre)',
+            },
+            dose: {
+              type: 'string',
+              description: 'Tipo ou número da dose (ex: única, 1ª dose)',
+            },
           },
           required: ['name'],
         },

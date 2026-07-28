@@ -109,7 +109,9 @@ export class EnvironmentVariables {
  * Usado como `validate` no ConfigModule.forRoot().
  * Converte strings do .env para os tipos corretos e valida.
  */
-export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
+export function validateEnv(
+  config: Record<string, unknown>,
+): EnvironmentVariables {
   const validatedConfig = plainToInstance(EnvironmentVariables, config, {
     enableImplicitConversion: true,
   });

@@ -9,6 +9,7 @@ import { DatabaseConfig } from './config/database.config';
 import configuration from './config/configuration';
 import { validateEnv } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { AnalyzeModule } from './modules/analyze/analyze.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -28,6 +29,7 @@ import { UsersModule } from './modules/users/users.module';
     HealthModule,
     // Módulos de domínio
     UsersModule,
+    AnalyzeModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },

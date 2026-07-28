@@ -17,9 +17,10 @@ export interface ApiResponse<T> {
  * `{ data, timestamp }`. Facilita o consumo padronizado pelo front.
  */
 @Injectable()
-export class TransformInterceptor<T>
-  implements NestInterceptor<T, ApiResponse<T>>
-{
+export class TransformInterceptor<T> implements NestInterceptor<
+  T,
+  ApiResponse<T>
+> {
   intercept(
     _context: ExecutionContext,
     next: CallHandler,

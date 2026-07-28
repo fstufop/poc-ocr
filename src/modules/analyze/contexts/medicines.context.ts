@@ -16,7 +16,10 @@ Retorne apenas os dados encontrados.`,
           properties: {
             name: { type: 'string', description: 'Nome do medicamento' },
             dosage: { type: 'string', description: 'Dosagem (ex: 500mg)' },
-            frequency: { type: 'string', description: 'Frequência (ex: 8h, 1x ao dia)' },
+            frequency: {
+              type: 'string',
+              description: 'Frequência (ex: 8h, 1x ao dia)',
+            },
           },
           required: ['name'],
         },
