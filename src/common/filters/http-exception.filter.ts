@@ -64,7 +64,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         exception instanceof Error ? exception.stack : String(exception),
       );
     } else {
-      this.logger.warn(`${request.method} ${request.url} -> ${status}`);
+      const msg = Array.isArray(message) ? message.join(', ') : message;
+      this.logger.warn(
+        `${request.method} ${request.url} -> ${status}${error ? ` [${error}]` : ''}: ${msg}`,
+      );
     }
 
     response.status(status).json(body);
