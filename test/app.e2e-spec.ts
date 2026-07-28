@@ -28,7 +28,8 @@ describe('App (e2e)', () => {
 
   it('/health (GET) retorna status ok', async () => {
     const res = await request(app.getHttpServer()).get('/health');
+    const body = res.body as { status: string };
     expect(res.status).toBe(200);
-    expect(res.body.status).toBe('ok');
+    expect(body.status).toBe('ok');
   });
 });

@@ -100,7 +100,7 @@ describe('AnalyzeService', () => {
 
     it('lança BadRequestException quando file é undefined', async () => {
       await expect(
-        service.analyzeMedicines(undefined as any),
+        service.analyzeMedicines(undefined as unknown as Express.Multer.File),
       ).rejects.toBeInstanceOf(BadRequestException);
     });
 

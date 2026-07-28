@@ -1,5 +1,7 @@
 import {
   Controller,
+  HttpCode,
+  HttpStatus,
   Inject,
   Post,
   UploadedFile,
@@ -25,6 +27,7 @@ export class AnalyzeController {
   ) {}
 
   @Post('medicines')
+  @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   analyzeMedicines(
     @UploadedFile() file: Express.Multer.File,
@@ -33,6 +36,7 @@ export class AnalyzeController {
   }
 
   @Post('vaccines')
+  @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   analyzeVaccines(
     @UploadedFile() file: Express.Multer.File,

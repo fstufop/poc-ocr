@@ -35,9 +35,10 @@ describe('Users (e2e)', () => {
       .post('/users')
       .send({ name: 'Ada Lovelace', email: `ada+${Date.now()}@example.com` });
 
+    const body = res.body as { id: string };
     expect(res.status).toBe(201);
-    expect(res.body.id).toBeDefined();
-    createdId = res.body.id as string;
+    expect(body.id).toBeDefined();
+    createdId = body.id;
   });
 
   it('POST /users rejeita payload inválido com 400', async () => {
@@ -50,8 +51,9 @@ describe('Users (e2e)', () => {
 
   it('GET /users/:id retorna o usuário criado', async () => {
     const res = await request(app.getHttpServer()).get(`/users/${createdId}`);
+    const body = res.body as { id: string };
     expect(res.status).toBe(200);
-    expect(res.body.id).toBe(createdId);
+    expect(body.id).toBe(createdId);
   });
 
   it('GET /users/:id com uuid inexistente retorna 404', async () => {
