@@ -48,14 +48,20 @@ export class GeminiAdapter implements AIProviderPort {
       },
     });
 
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(
+    let timeoutHandle!: ReturnType<typeof setTimeout>;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutHandle = setTimeout(
         () => reject(new GatewayTimeoutException('AI provider timed out')),
         this.timeoutMs,
-      ),
-    );
+      );
+    });
 
-    const response = await Promise.race([responsePromise, timeoutPromise]);
+    let response: Awaited<typeof responsePromise>;
+    try {
+      response = await Promise.race([responsePromise, timeoutPromise]);
+    } finally {
+      clearTimeout(timeoutHandle);
+    }
 
     if (!response.text) {
       throw new BadGatewayException(

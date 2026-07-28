@@ -136,7 +136,10 @@ describe('AnalyzeService', () => {
     it('chama tokenUsageService.record() com endpoint, provider, model e tokenUsage corretos', async () => {
       const file = buildFile({ mimetype: 'image/jpeg' });
       const tokenUsage = { inputTokens: 10, outputTokens: 5, totalTokens: 15 };
-      imageProcessor.extract.mockResolvedValue({ data: { medicines: [] }, tokenUsage });
+      imageProcessor.extract.mockResolvedValue({
+        data: { medicines: [] },
+        tokenUsage,
+      });
 
       await service.analyzeMedicines(file);
       await Promise.resolve(); // flush microtask queue
@@ -177,6 +180,16 @@ describe('AnalyzeService', () => {
         VaccinesContext,
       );
       expect(result).toEqual(expected);
+    });
+
+    it('não propaga erro do tokenUsageService.record() para o cliente', async () => {
+      const file = buildFile({ mimetype: 'image/png' });
+      imageProcessor.extract.mockResolvedValue(wrapResult({ vaccines: [] }));
+      tokenUsageService.record.mockRejectedValue(new Error('DB down'));
+
+      await expect(service.analyzeVaccines(file)).resolves.toEqual({
+        vaccines: [],
+      });
     });
   });
 });
