@@ -7,6 +7,9 @@ import request from 'supertest';
 import { AI_PROVIDER } from '../src/ai/ai-provider.port';
 import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
 import { AnalyzeModule } from '../src/modules/analyze/analyze.module';
+import { TokenUsageService } from '../src/modules/token-usage/token-usage.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { TokenUsageRecord } from '../src/modules/token-usage/entities/token-usage-record.entity';
 
 describe('AnalyzeController (e2e)', () => {
   let app: INestApplication;
@@ -55,6 +58,10 @@ describe('AnalyzeController (e2e)', () => {
       .useValue(mockAiProvider)
       .overrideProvider(ConfigService)
       .useValue(mockConfigService)
+      .overrideProvider(TokenUsageService)
+      .useValue({ record: jest.fn().mockResolvedValue(undefined) })
+      .overrideProvider(getRepositoryToken(TokenUsageRecord))
+      .useValue({})
       .compile();
 
     app = moduleRef.createNestApplication();

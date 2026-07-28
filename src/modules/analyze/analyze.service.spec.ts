@@ -11,12 +11,14 @@ import { AnalyzeService } from './analyze.service';
 import { AudioProcessor } from './processors/audio.processor';
 import { ImageProcessor } from './processors/image.processor';
 import { PdfProcessor } from './processors/pdf.processor';
+import { TokenUsageService } from '../token-usage/token-usage.service';
 
 describe('AnalyzeService', () => {
   let service: AnalyzeService;
   let audioProcessor: { extract: jest.Mock };
   let imageProcessor: { extract: jest.Mock };
   let pdfProcessor: { extract: jest.Mock };
+  let tokenUsageService: { record: jest.Mock };
 
   const buildFile = (
     overrides: Partial<Express.Multer.File> = {},
@@ -39,6 +41,7 @@ describe('AnalyzeService', () => {
     audioProcessor = { extract: jest.fn() };
     imageProcessor = { extract: jest.fn() };
     pdfProcessor = { extract: jest.fn() };
+    tokenUsageService = { record: jest.fn().mockResolvedValue(undefined) };
 
     const module = await Test.createTestingModule({
       providers: [
@@ -46,6 +49,7 @@ describe('AnalyzeService', () => {
         { provide: AudioProcessor, useValue: audioProcessor },
         { provide: ImageProcessor, useValue: imageProcessor },
         { provide: PdfProcessor, useValue: pdfProcessor },
+        { provide: TokenUsageService, useValue: tokenUsageService },
         {
           provide: ConfigService,
           useValue: {
@@ -126,6 +130,34 @@ describe('AnalyzeService', () => {
 
       await expect(service.analyzeMedicines(file)).rejects.toMatchObject({
         status: HttpStatus.PAYLOAD_TOO_LARGE,
+      });
+    });
+
+    it('chama tokenUsageService.record() com endpoint, provider, model e tokenUsage corretos', async () => {
+      const file = buildFile({ mimetype: 'image/jpeg' });
+      const tokenUsage = { inputTokens: 10, outputTokens: 5, totalTokens: 15 };
+      imageProcessor.extract.mockResolvedValue({ data: { medicines: [] }, tokenUsage });
+
+      await service.analyzeMedicines(file);
+      await Promise.resolve(); // flush microtask queue
+
+      expect(tokenUsageService.record).toHaveBeenCalledWith({
+        endpoint: 'analyze/medicines',
+        provider: 'gemini',
+        model: 'gemini-1.5-flash',
+        inputTokens: 10,
+        outputTokens: 5,
+        totalTokens: 15,
+      });
+    });
+
+    it('não propaga erro do tokenUsageService.record() para o cliente', async () => {
+      const file = buildFile({ mimetype: 'image/jpeg' });
+      imageProcessor.extract.mockResolvedValue(wrapResult({ medicines: [] }));
+      tokenUsageService.record.mockRejectedValue(new Error('DB down'));
+
+      await expect(service.analyzeMedicines(file)).resolves.toEqual({
+        medicines: [],
       });
     });
   });

@@ -16,6 +16,7 @@ import { IProcessor } from './interfaces/processor.interface';
 import { AudioProcessor } from './processors/audio.processor';
 import { ImageProcessor } from './processors/image.processor';
 import { PdfProcessor } from './processors/pdf.processor';
+import { TokenUsageService } from '../token-usage/token-usage.service';
 
 type MediaType = 'audio' | 'image' | 'pdf';
 
@@ -51,6 +52,7 @@ export class AnalyzeService implements IAnalyzeService {
     private readonly audioProcessor: AudioProcessor,
     private readonly imageProcessor: ImageProcessor,
     private readonly pdfProcessor: PdfProcessor,
+    private readonly tokenUsageService: TokenUsageService,
   ) {}
 
   private resolveProcessor(mimeType: string): IProcessor {
@@ -90,16 +92,35 @@ export class AnalyzeService implements IAnalyzeService {
     }
   }
 
+  private recordUsage(
+    endpoint: string,
+    tokenUsage: {
+      inputTokens: number;
+      outputTokens: number;
+      totalTokens: number;
+    },
+  ): void {
+    this.tokenUsageService
+      .record({
+        endpoint,
+        provider: 'gemini',
+        model: this.config.get<string>('GEMINI_MODEL', 'gemini-1.5-flash'),
+        ...tokenUsage,
+      })
+      .catch((err) => this.logger.error('Failed to record token usage', err));
+  }
+
   async analyzeMedicines(
     file: Express.Multer.File,
   ): Promise<MedicinesAnalysisDto> {
     this.validateFile(file);
     const processor = this.resolveProcessor(file.mimetype);
     this.logger.log(`Analyzing medicines — mimeType: ${file.mimetype}`);
-    const { data } = await processor.extract<MedicinesAnalysisDto>(
+    const { data, tokenUsage } = await processor.extract<MedicinesAnalysisDto>(
       file,
       MedicinesContext,
     );
+    this.recordUsage('analyze/medicines', tokenUsage);
     return data;
   }
 
@@ -109,10 +130,11 @@ export class AnalyzeService implements IAnalyzeService {
     this.validateFile(file);
     const processor = this.resolveProcessor(file.mimetype);
     this.logger.log(`Analyzing vaccines — mimeType: ${file.mimetype}`);
-    const { data } = await processor.extract<VaccinesAnalysisDto>(
+    const { data, tokenUsage } = await processor.extract<VaccinesAnalysisDto>(
       file,
       VaccinesContext,
     );
+    this.recordUsage('analyze/vaccines', tokenUsage);
     return data;
   }
 }
