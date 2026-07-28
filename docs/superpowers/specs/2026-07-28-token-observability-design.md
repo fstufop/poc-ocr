@@ -84,7 +84,7 @@ src/
 │           └── token-usage-record.entity.ts
 └── database/
     └── migrations/
-        └── 1753660800000-CreateTokenUsageTable.ts
+        └── 1785196800000-CreateTokenUsageTable.ts
 ```
 
 ---
@@ -185,7 +185,7 @@ Tabela: `token_usage`
   ],
   "byDay": [
     {
-      "date": "2026-07-27",
+      "date": "2026-07-27",   // formato YYYY-MM-DD
       "requestCount": 15,
       "inputTokens": 4500,
       "outputTokens": 1200,
