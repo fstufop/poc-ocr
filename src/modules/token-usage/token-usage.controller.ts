@@ -1,9 +1,12 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ApiKeyGuard } from '../../common/guards/api-key.guard';
 import { TokenUsageQueryDto } from './dto/token-usage-query.dto';
 import { TokenUsageResponseDto } from './dto/token-usage-response.dto';
 import { TokenUsageService } from './token-usage.service';
 
+@ApiTags('token-usage')
+@ApiSecurity('x-api-key')
 @Controller('token-usage')
 @UseGuards(ApiKeyGuard)
 export class TokenUsageController {
