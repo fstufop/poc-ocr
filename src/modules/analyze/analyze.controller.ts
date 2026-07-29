@@ -9,6 +9,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { memoryStorage } from 'multer';
 import { ApiKeyGuard } from '../../common/guards/api-key.guard';
 import { MedicinesAnalysisDto } from './dto/medicines-analysis.dto';
@@ -18,6 +25,8 @@ import {
   IAnalyzeService,
 } from './interfaces/analyze-service.interface';
 
+@ApiTags('analyze')
+@ApiSecurity('x-api-key')
 @Controller('analyze')
 @UseGuards(ApiKeyGuard)
 export class AnalyzeController {
@@ -29,6 +38,17 @@ export class AnalyzeController {
   @Post('medicines')
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiOkResponse({ type: MedicinesAnalysisDto })
   analyzeMedicines(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<MedicinesAnalysisDto> {
@@ -38,6 +58,17 @@ export class AnalyzeController {
   @Post('vaccines')
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiOkResponse({ type: VaccinesAnalysisDto })
   analyzeVaccines(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<VaccinesAnalysisDto> {
